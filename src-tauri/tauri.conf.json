@@ -1,0 +1,38 @@
+{
+  "productName": "GavinsMedia",
+  "version": "1.0.0",
+  "identifier": "com.gavinsmedia.requests",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "security": {
+      "capabilities": [
+        "default"
+      ],
+      "dangerousDisableAssetCspModification": true
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "GavinsMedia",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "devtools": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ]
+  }
+}

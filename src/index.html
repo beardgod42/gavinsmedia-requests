@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>GavinsMedia</title>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --bg2: #ede0cc;
+      --bg3: #e2d0b8;
+      --card: #fdf8f2;
+      --border: #d4b896;
+      --accent: #7c4a1e;
+      --accent2: #a0622a;
+      --text: #2c1a0e;
+      --text2: #7c5a3a;
+      --text3: #a07850;
+      --badge-available-bg: #d4edda;
+      --badge-available-fg: #155724;
+      --badge-requested-bg: #fff3cd;
+      --badge-requested-fg: #856404;
+      --badge-pending-bg: #cce5ff;
+      --badge-pending-fg: #004085;
+      --shadow: rgba(0,0,0,0.08);
+      --shadow2: rgba(0,0,0,0.15);
+    }
+    [data-theme="dark"] {
+      --bg: #141414;
+      --bg2: #1e1e1e;
+      --bg3: #252525;
+      --card: #1a1a1a;
+      --border: #333;
+      --accent: #e5a00d;
+      --accent2: #f0b429;
+      --text: #f0e6d3;
+      --text2: #a89070;
+      --text3: #7a6050;
+      --badge-available-bg: #0d3320;
+      --badge-available-fg: #4caf86;
+      --badge-requested-bg: #2a1f00;
+      --badge-requested-fg: #e5a00d;
+      --badge-pending-bg: #1a1a2e;
+      --badge-pending-fg: #7986cb;
+      --shadow: rgba(0,0,0,0.3);
+      --shadow2: rgba(0,0,0,0.5);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s, color 0.3s; }
+
+    /* LOGIN */
+    #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg2); }
+    .login-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 48px 44px; width: 400px; box-shadow: 0 32px 80px var(--shadow2); }
+    .login-logo { text-align: center; margin-bottom: 36px; }
+    .login-logo h1 { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+    .login-logo p { color: var(--text3); font-size: 14px; margin-top: 6px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .form-group input { width: 100%; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 16px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-group input:focus { border-color: var(--accent); }
+    .btn-signin { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: background 0.2s, transform 0.1s; letter-spacing: 0.3px; }
+    .btn-signin:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-signin:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .error-msg { background: #fdf0f0; border: 1px solid #e88080; color: #c00; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 14px; display: none; }
+    [data-theme="dark"] .error-msg { background: #2a1515; border-color: #5a1a1a; color: #ff6b6b; }
+
+    /* APP */
+    #app-screen { display: none; flex-direction: column; height: 100vh; }
+
+    /* NAVBAR */
+    .navbar { background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 2px; flex-shrink: 0; height: 56px; }
+    .brand { font-size: 16px; font-weight: 800; color: var(--accent); margin-right: 16px; letter-spacing: -0.3px; }
+    .nav-btn { background: none; border: none; color: var(--text2); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
+    .nav-btn:hover { color: var(--text); background: var(--bg3); }
+    .nav-btn.active { color: var(--accent); background: var(--bg3); font-weight: 700; }
+    .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .user-badge { font-size: 13px; color: var(--text2); font-weight: 500; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .theme-btn { background: none; border: 1px solid var(--border); color: var(--text2); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .theme-btn:hover { background: var(--bg3); color: var(--text); }
+    .btn-logout { background: none; border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* GENRE BAR */
+    .genre-bar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 12px; flex-shrink: 0; align-items: center; }
+    .genre-bar::-webkit-scrollbar { display: none; }
+    .genre-btn { background: var(--card); border: 1px solid var(--border); color: var(--text2); padding: 4px 11px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 500; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+    .genre-btn:hover { background: var(--bg3); color: var(--text); }
+    .genre-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .genre-sep { width: 1px; background: var(--border); margin: 2px 4px; flex-shrink: 0; }
+
+    /* SEARCH */
+    .search-bar { padding: 16px 20px 0; flex-shrink: 0; background: var(--bg); }
+    .search-input-wrap { position: relative; max-width: 480px; }
+    .search-input-wrap input { width: 100%; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 16px 11px 40px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .search-input-wrap input:focus { border-color: var(--accent); }
+    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 15px; pointer-events: none; }
+
+    /* CONTENT */
+    .content { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .section-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .section-divider { margin: 28px 0 0; }
+
+    /* GRID */
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+    .media-card { background: var(--card); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+    .media-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px var(--shadow2); border-color: var(--accent); }
+    .media-card .poster-wrap { position: relative; }
+    .media-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: var(--bg3); }
+    .media-card .card-info { padding: 10px 10px 12px; }
+    .media-card .card-title { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+    .media-card .card-year { font-size: 11px; color: var(--text3); margin-top: 3px; }
+    .media-card .card-status { font-size: 10px; font-weight: 600; margin-top: 5px; padding: 3px 7px; border-radius: 4px; display: inline-block; }
+    .status-available { background: var(--badge-available-bg); color: var(--badge-available-fg); }
+    .status-requested { background: var(--badge-requested-bg); color: var(--badge-requested-fg); }
+    .status-pending { background: var(--badge-pending-bg); color: var(--badge-pending-fg); }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; backdrop-filter: blur(4px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 660px; max-height: 88vh; overflow-y: auto; box-shadow: 0 32px 80px var(--shadow2); }
+    .modal-header { display: flex; gap: 22px; padding: 28px; border-bottom: 1px solid var(--border); }
+    .modal-poster { width: 110px; height: 165px; border-radius: 10px; flex-shrink: 0; object-fit: cover; background: var(--bg3); box-shadow: 0 8px 24px var(--shadow); }
+    .modal-meta { flex: 1; }
+    .modal-meta h2 { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px; line-height: 1.2; }
+    .modal-meta .meta-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .modal-meta .year-badge { font-size: 12px; color: var(--text3); background: var(--bg2); padding: 3px 10px; border-radius: 20px; }
+    .modal-meta .type-badge { font-size: 12px; color: var(--accent); background: var(--bg2); padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .modal-meta .overview { font-size: 13px; color: var(--text2); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+    .modal-footer { padding: 20px 28px; display: flex; gap: 10px; justify-content: flex-end; background: var(--bg2); border-radius: 0 0 20px 20px; }
+    .btn-request { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-request:hover { background: var(--accent2); }
+    .btn-request:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-cancel { background: none; border: 1.5px solid var(--border); color: var(--text2); border-radius: 10px; padding: 12px 24px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .btn-cancel:hover { border-color: var(--text2); color: var(--text); }
+
+    /* REQUESTS */
+    .requests-list { display: flex; flex-direction: column; gap: 10px; }
+    .request-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; transition: box-shadow 0.2s; }
+    .request-item:hover { box-shadow: 0 4px 16px var(--shadow); }
+    .request-item img { width: 44px; height: 66px; object-fit: cover; border-radius: 6px; background: var(--bg3); flex-shrink: 0; }
+    .request-item-info { flex: 1; min-width: 0; }
+    .request-item-info h4 { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .request-item-info p { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+    /* LOADING / EMPTY */
+    .loading { display: flex; align-items: center; justify-content: center; padding: 80px; color: var(--text3); font-size: 14px; }
+    .spinner { width: 22px; height: 22px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 80px 40px; color: var(--text3); }
+    .empty-state h3 { font-size: 17px; margin-bottom: 8px; color: var(--text2); font-weight: 600; }
+    .empty-state p { font-size: 13px; }
+    .load-more { display: block; margin: 24px auto 0; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .load-more:hover { background: var(--accent2); }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; color: var(--text); box-shadow: 0 8px 32px var(--shadow2); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 200; font-weight: 500; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--accent); color: var(--accent); }
+    .toast.error { border-color: #e05; color: #e05; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-logo">
+        <h1>GavinsMedia</h1>
+        <p>Request movies &amp; TV shows</p>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" id="login-user" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" />
+      </div>
+      <button class="btn-signin" id="login-btn">Sign In</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+  </div>
+
+  <div id="app-screen">
+    <div class="navbar">
+      <span class="brand">GavinsMedia</span>
+      <button class="nav-btn active" data-tab="discover">Discover</button>
+      <button class="nav-btn" data-tab="movies">Movies</button>
+      <button class="nav-btn" data-tab="tv">TV Shows</button>
+      <button class="nav-btn" data-tab="requests">My Requests</button>
+      <div class="navbar-right">
+        <span class="user-badge" id="user-badge"></span>
+        <button class="theme-btn" id="theme-btn" title="Toggle theme">🌙</button>
+        <button class="btn-logout" id="logout-btn">Sign Out</button>
+      </div>
+    </div>
+    <div class="genre-bar" id="genre-bar">
+      <span class="genre-label">Browse:</span>
+      <div class="genre-select-wrap" id="genre-select-wrap">
+        <select id="genre-select">
+          <option value="|movie">🎬 All Movies</option>
+          <option value="28|movie">💥 Action</option>
+          <option value="35|movie">😂 Comedy</option>
+          <option value="27|movie">👻 Horror</option>
+          <option value="10749|movie">💕 Romance</option>
+          <option value="878|movie">🚀 Sci-Fi</option>
+          <option value="18|movie">🎭 Drama</option>
+          <option value="16|movie">✨ Animation</option>
+          <option value="53|movie">🔪 Thriller</option>
+          <option value="12|movie">🗺️ Adventure</option>
+          <option value="80|movie">🔫 Crime</option>
+          <option value="99|movie">📽️ Documentary</option>
+          <option value="14|movie">🧙 Fantasy</option>
+        </select>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search movies, TV shows..." />
+      </div>
+    </div>
+    <div class="content" id="main-content"></div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <img id="modal-poster" src="" alt="" class="modal-poster" />
+        <div class="modal-meta">
+          <h2 id="modal-title"></h2>
+          <div class="meta-row">
+            <span class="year-badge" id="modal-year"></span>
+            <span class="type-badge" id="modal-type"></span>
+          </div>
+          <div class="overview" id="modal-overview"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="modal-close">Cancel</button>
+        <button class="btn-request" id="modal-request-btn">Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const TMDB = 'https://image.tmdb.org/t/p/w300'
+    let authToken = null, currentUser = null, currentTab = 'discover'
+    let searchTimeout = null, modalMedia = null
+    let currentPage = 1, currentGenre = '', currentGenreType = 'movie'
+
+    // THEME
+    function initTheme() {
+      const saved = localStorage.getItem('gm-theme') || 'light'
+      document.documentElement.setAttribute('data-theme', saved)
+      document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙'
+    }
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme')
+      const next = current === 'dark' ? 'light' : 'dark'
+      document.documentElement.setAttribute('data-theme', next)
+      localStorage.setItem('gm-theme', next)
+      document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙'
+    }
+    initTheme()
+
+    // PERSISTENT SESSION
+    function saveSession(cookie, user) {
+      localStorage.setItem('gm-cookie', cookie)
+      localStorage.setItem('gm-user', JSON.stringify(user))
+    }
+    function clearSession() {
+      localStorage.removeItem('gm-cookie')
+      localStorage.removeItem('gm-user')
+    }
+    async function tryAutoLogin() {
+      const cookie = localStorage.getItem('gm-cookie')
+      const userStr = localStorage.getItem('gm-user')
+      if (!cookie || !userStr) return false
+      // Verify session still valid
+      const res = await apiRequest('GET', '/auth/me', null, cookie)
+      if (res.ok) {
+        authToken = cookie
+        currentUser = JSON.parse(userStr)
+        return true
+      }
+      clearSession()
+      return false
+    }
+
+    async function invoke(cmd, args) {
+      return window.__TAURI__.core.invoke(cmd, args || {})
+    }
+    async function apiRequest(method, endpoint, body, token) {
+      try {
+        return await invoke('api_request', { method, endpoint, body: body||null, token: token||null })
+      } catch(e) { return { ok: false, data: { message: String(e) } } }
+    }
+
+    async function login() {
+      const email = document.getElementById('login-user').value.trim()
+      const password = document.getElementById('login-pass').value.trim()
+      const btn = document.getElementById('login-btn')
+      const err = document.getElementById('login-error')
+      if (!email || !password) return
+      btn.disabled = true; btn.textContent = 'Signing in...'
+      err.style.display = 'none'
+      const res = await invoke('login_local', { email, password })
+      if (res.ok && res.cookie) {
+        authToken = res.cookie
+        currentUser = res.data
+        saveSession(authToken, currentUser)
+        showApp()
+      } else {
+        err.textContent = res.data?.message || 'Invalid email or password.'
+        err.style.display = 'block'
+        btn.disabled = false; btn.textContent = 'Sign In'
+      }
+    }
+
+    function showApp() {
+      document.getElementById('login-screen').style.display = 'none'
+      document.getElementById('app-screen').style.display = 'flex'
+      document.getElementById('user-badge').textContent = currentUser?.displayName || currentUser?.username || ''
+      loadTab('discover')
+    }
+
+    function logout() {
+      authToken = null; currentUser = null
+      clearSession()
+      document.getElementById('app-screen').style.display = 'none'
+      document.getElementById('login-screen').style.display = 'flex'
+      document.getElementById('login-user').value = ''
+      document.getElementById('login-pass').value = ''
+    }
+
+    async function loadTab(tab) {
+      currentTab = tab
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+      document.querySelector('[data-tab="'+tab+'"]').classList.add('active')
+      document.getElementById('search-input').value = ''
+      currentGenre = ''
+      currentPage = 1
+      if (tab === 'requests') {
+        hideGenreBar()
+        loadRequests()
+      } else if (tab === 'discover') {
+        showGenreBar('discover')
+        document.getElementById('genre-select').value = document.getElementById('genre-select').options[0]?.value || ''
+        loadDiscoverHome()
+      } else if (tab === 'movies') {
+        showGenreBar('movies')
+        document.getElementById('genre-select').value = document.getElementById('genre-select').options[0]?.value || ''
+        loadDiscover('movies')
+      } else if (tab === 'tv') {
+        showGenreBar('tv')
+        document.getElementById('genre-select').value = document.getElementById('genre-select').options[0]?.value || ''
+        loadDiscover('tv')
+      }
+    }
+
+    const movieGenres = [
+      ['|movie','🎬 All Movies'],['28|movie','💥 Action'],['35|movie','😂 Comedy'],
+      ['27|movie','👻 Horror'],['10749|movie','💕 Romance'],['878|movie','🚀 Sci-Fi'],
+      ['18|movie','🎭 Drama'],['16|movie','✨ Animation'],['53|movie','🔪 Thriller'],
+      ['12|movie','🗺️ Adventure'],['80|movie','🔫 Crime'],['99|movie','📽️ Documentary'],['14|movie','🧙 Fantasy']
+    ]
+    const tvGenres = [
+      ['|tv','📺 All TV Shows'],['10759|tv','💥 Action & Adventure'],['35|tv','😂 Comedy'],
+      ['18|tv','🎭 Drama'],['10765|tv','🚀 Sci-Fi & Fantasy'],['9648|tv','🔍 Mystery'],
+      ['80|tv','🔫 Crime'],['10767|tv','🎙️ Talk Show'],['99|tv','📽️ Documentary'],['16|tv','✨ Animation']
+    ]
+    const bothGenres = [...movieGenres, ...tvGenres]
+
+    function updateGenreDropdown(genres) {
+      const sel = document.getElementById('genre-select')
+      sel.innerHTML = genres.map(([v,l]) => '<option value="'+v+'">'+l+'</option>').join('')
+      currentGenre = ''; currentGenreType = genres[0][0].split('|')[1]
+    }
+
+    function showGenreBar(tab) {
+      document.getElementById('genre-bar').style.display = 'flex'
+      if (tab === 'movies') updateGenreDropdown(movieGenres)
+      else if (tab === 'tv') updateGenreDropdown(tvGenres)
+      else updateGenreDropdown(bothGenres)
+    }
+    function hideGenreBar() { document.getElementById('genre-bar').style.display = 'none' }
+
+    async function loadDiscover(tab) {
+      const c = document.getElementById('main-content')
+      c.innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>'
+      const endpoint = tab === 'tv' ? '/discover/tv' : '/discover/movies'
+      const title = tab === 'tv' ? 'Trending TV Shows' : 'Trending Movies'
+      const res = await apiRequest('GET', endpoint, null, authToken)
+      if (!res.ok) { c.innerHTML = '<div class="empty-state"><h3>Failed to load</h3></div>'; return }
+      c.innerHTML = '<div class="section-title" style="margin-bottom:16px">'+title+'</div><div class="media-grid" id="grid"></div>'
+      renderCards((res.data.results||[]).slice(0,24), document.getElementById('grid'))
+    }
+
+    async function loadDiscoverHome() {
+      const c = document.getElementById('main-content')
+      c.innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>'
+      const [trendM, trendTV, topM, upcomingM, topTV, nowPlaying] = await Promise.all([
+        apiRequest('GET', '/discover/movies', null, authToken),
+        apiRequest('GET', '/discover/tv', null, authToken),
+        apiRequest('GET', '/discover/movies?sortBy=votes', null, authToken),
+        apiRequest('GET', '/discover/movies/upcoming', null, authToken),
+        apiRequest('GET', '/discover/tv?sortBy=votes', null, authToken),
+        apiRequest('GET', '/discover/movies/now-playing', null, authToken),
+      ])
+      c.innerHTML = ''
+      function addSection(title, results, first) {
+        if (!results?.length) return
+        const wrap = document.createElement('div')
+        if (!first) wrap.className = 'section-divider'
+        const t = document.createElement('div'); t.className = 'section-title'; t.style.marginBottom='14px'; t.textContent = title
+        const g = document.createElement('div'); g.className = 'media-grid'
+        wrap.appendChild(t); wrap.appendChild(g)
+        c.appendChild(wrap)
+        renderCards(results.slice(0,12), g)
+      }
+      addSection('🔥 Trending Movies', trendM.ok ? trendM.data.results : [], true)
+      addSection('🔥 Trending TV Shows', trendTV.ok ? trendTV.data.results : [], false)
+      addSection('⭐ Top Rated Movies', topM.ok ? topM.data.results : [], false)
+      addSection('🎬 Now Playing', nowPlaying.ok ? nowPlaying.data.results : [], false)
+      addSection('📅 Upcoming Movies', upcomingM.ok ? upcomingM.data.results : [], false)
+      addSection('⭐ Top Rated TV Shows', topTV.ok ? topTV.data.results : [], false)
+    }
+
+    async function loadRequests() {
+      const c = document.getElementById('main-content')
+      c.innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>'
+      const res = await apiRequest('GET', '/request?take=40&skip=0&filter=all&sort=added', null, authToken)
+      if (!res.ok) { c.innerHTML = '<div class="empty-state"><h3>Failed to load</h3></div>'; return }
+      const reqs = res.data.results||[]
+      c.innerHTML = '<div class="section-title" style="margin-bottom:16px">My Requests</div><div class="requests-list" id="req-list"></div>'
+      if (!reqs.length) { document.getElementById('req-list').innerHTML='<div class="empty-state"><h3>No requests yet</h3><p>Search for something to get started.</p></div>'; return }
+      reqs.forEach(req => {
+        const m=req.media, title=m?.originalTitle||m?.originalName||'Unknown'
+        const poster=m?.posterPath?TMDB+m.posterPath:''
+        const statusMap={PENDING:'Pending',APPROVED:'Approved',DECLINED:'Declined',AVAILABLE:'Available',PROCESSING:'Processing'}
+        const status=statusMap[m?.status]||'Pending'
+        const el=document.createElement('div'); el.className='request-item'
+        el.innerHTML='<img src="'+poster+'" onerror="this.style.visibility=\'hidden\'"/><div class="request-item-info"><h4>'+title+'</h4><p>'+(req.type==='movie'?'🎬 Movie':'📺 TV Show')+' &nbsp;·&nbsp; '+status+'</p></div><span class="card-status '+getStatusClass(m?.status)+'">'+status+'</span>'
+        document.getElementById('req-list').appendChild(el)
+      })
+    }
+
+    async function loadGenre(genreId, type, page) {
+      const c = document.getElementById('main-content')
+      if (page === 1) c.innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>'
+      const genreParam = genreId ? '&genre='+genreId : ''
+      const endpoint = (type==='tv' ? '/discover/tv' : '/discover/movies') + '?page='+page+genreParam
+      const res = await apiRequest('GET', endpoint, null, authToken)
+      if (!res.ok) { c.innerHTML = '<div class="empty-state"><h3>Failed to load</h3></div>'; return }
+      if (page === 1) {
+        c.innerHTML = '<div class="media-grid" id="grid"></div>'
+      }
+      renderCards(res.data.results||[], document.getElementById('grid'))
+      const existing = document.getElementById('load-more-btn')
+      if (existing) existing.remove()
+      const btn = document.createElement('button'); btn.className='load-more'; btn.id='load-more-btn'; btn.textContent='Load More'
+      btn.onclick = () => { currentPage++; loadGenre(currentGenre, currentGenreType, currentPage) }
+      c.appendChild(btn)
+    }
+
+    async function doSearch(query) {
+      if (!query.trim()) { loadTab(currentTab); return }
+      const c = document.getElementById('main-content')
+      c.innerHTML = '<div class="loading"><div class="spinner"></div> Searching...</div>'
+      const res = await apiRequest('GET', '/search?query='+encodeURIComponent(query)+'&page=1', null, authToken)
+      if (!res.ok) { c.innerHTML='<div class="empty-state"><h3>Search failed</h3></div>'; return }
+      const results=(res.data.results||[]).filter(r=>r.mediaType==='movie'||r.mediaType==='tv')
+      c.innerHTML='<div class="section-title" style="margin-bottom:16px">Results for "'+query+'"</div><div class="media-grid" id="grid"></div>'
+      if (!results.length) { document.getElementById('grid').innerHTML='<div class="empty-state"><h3>No results found</h3></div>'; return }
+      renderCards(results, document.getElementById('grid'))
+    }
+
+    function renderCards(items, container) {
+      items.forEach(item => {
+        const title=item.title||item.name||'Unknown'
+        const year=(item.releaseDate||item.firstAirDate||'').slice(0,4)
+        const poster=item.posterPath?TMDB+item.posterPath:''
+        const sl=getStatusLabel(item.mediaInfo?.status)
+        const card=document.createElement('div'); card.className='media-card'
+        card.innerHTML='<div class="poster-wrap"><img src="'+poster+'" loading="lazy" onerror="this.style.background=\'var(--bg3)\';this.style.minHeight=\'210px\'"/></div><div class="card-info"><div class="card-title">'+title+'</div><div class="card-year">'+year+'</div>'+(sl?'<span class="card-status '+getStatusClass(item.mediaInfo?.status)+'">'+sl+'</span>':'')+'</div>'
+        card.addEventListener('click', ()=>openModal(item))
+        container.appendChild(card)
+      })
+    }
+
+    function getStatusClass(s){if(!s)return'';if(s===5||s===4)return'status-available';if(s===3)return'status-requested';return'status-pending'}
+    function getStatusLabel(s){if(!s)return'';if(s===5||s===4)return'Available';if(s===3)return'Requested';if(s===2)return'Processing';return''}
+
+    function openModal(item) {
+      modalMedia=item
+      document.getElementById('modal-title').textContent=item.title||item.name||'Unknown'
+      document.getElementById('modal-year').textContent=(item.releaseDate||item.firstAirDate||'').slice(0,4)
+      document.getElementById('modal-type').textContent=item.mediaType==='movie'?'🎬 Movie':'📺 TV Show'
+      document.getElementById('modal-overview').textContent=item.overview||'No description available.'
+      document.getElementById('modal-poster').src=item.posterPath?TMDB+item.posterPath:''
+      const btn=document.getElementById('modal-request-btn'),s=item.mediaInfo?.status
+      if(s===5||s===4){btn.textContent='✓ Already Available';btn.disabled=true}
+      else if(s===3){btn.textContent='✓ Already Requested';btn.disabled=true}
+      else{btn.textContent='Request';btn.disabled=false}
+      document.getElementById('modal-overlay').classList.add('open')
+    }
+
+    function closeModal(){document.getElementById('modal-overlay').classList.remove('open');modalMedia=null}
+
+    async function submitRequest() {
+      if(!modalMedia)return
+      const btn=document.getElementById('modal-request-btn')
+      btn.disabled=true; btn.textContent='Requesting...'
+      const body={mediaType:modalMedia.mediaType,mediaId:modalMedia.id}
+      if(modalMedia.mediaType==='tv')body.seasons='all'
+      const res=await apiRequest('POST','/request',body,authToken)
+      if(res.ok){showToast('✓ Request submitted!','success');closeModal();if(currentTab==='requests')loadRequests()}
+      else{showToast(res.data?.message||'Request failed.','error');btn.disabled=false;btn.textContent='Request'}
+    }
+
+    function showToast(msg,type=''){
+      const t=document.getElementById('toast')
+      t.textContent=msg; t.className='toast '+type+' show'
+      setTimeout(()=>t.classList.remove('show'),3500)
+    }
+
+    // AUTO LOGIN CHECK
+    window.addEventListener('DOMContentLoaded', async () => {
+      const loggedIn = await tryAutoLogin()
+      if (loggedIn) showApp()
+    })
+
+    document.getElementById('theme-btn').addEventListener('click', toggleTheme)
+    document.getElementById('login-btn').addEventListener('click', login)
+    document.getElementById('login-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') login() })
+    document.getElementById('login-user').addEventListener('keydown', e=>{ if(e.key==='Enter') login() })
+    document.getElementById('logout-btn').addEventListener('click', logout)
+    document.getElementById('modal-close').addEventListener('click', closeModal)
+    document.getElementById('modal-overlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal() })
+    document.getElementById('modal-request-btn').addEventListener('click', submitRequest)
+    document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>loadTab(b.dataset.tab)))
+    document.getElementById('search-input').addEventListener('input', e=>{
+      clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>doSearch(e.target.value),400)
+    })
+    document.getElementById('genre-select').addEventListener('change', e=>{
+      const [genre, type] = e.target.value.split('|')
+      currentGenre = genre
+      currentGenreType = type
+      currentPage = 1
+      if (currentTab === 'discover' && !genre) {
+        loadDiscoverHome()
+      } else {
+        loadGenre(genre, type, 1)
+      }
+    })
+  </script>
+</body>
+</html>
